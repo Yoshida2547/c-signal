@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "sndfile.h": "c",
+        "main.h": "c",
+        "effect.h": "c"
+    }
+}
