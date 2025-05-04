@@ -1,16 +1,15 @@
-# Project Name
+# Project name
 TARGET := my_project
 
 # Directories
 SRC_DIR := src
-INC_DIR := include
+INC_DIRS := include lib/minunit
 BUILD_DIR := build
-LIB_DIR := lib
 TEST_DIR := tests
 
 # Compiler and flags
 CC := gcc
-CFLAGS := -Wall -Wextra -I$(INC_DIR) -I$(LIB_DIR)
+CFLAGS := -Wall -Wextra $(foreach dir,$(INC_DIRS),-I$(dir))
 LDFLAGS := 
 
 # Source and object files
@@ -18,31 +17,37 @@ SRCS := $(wildcard $(SRC_DIR)/*.c)
 OBJS := $(patsubst $(SRC_DIR)/%.c, $(BUILD_DIR)/%.o, $(SRCS))
 
 # Default target
-all: $(BUILD_DIR)/$(TARGET)
+.PHONY: all check-deps
+all: check-deps $(BUILD_DIR)/$(TARGET)
 
-# Build target
+# Build the target
 $(BUILD_DIR)/$(TARGET): $(OBJS)
 	@mkdir -p $(@D)
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 	@echo "✅ Build complete: $@"
 
-# Compile source files
+# Compile each source file
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c
 	@mkdir -p $(@D)
 	$(CC) $(CFLAGS) -c $< -o $@
 
-# Clean
+# Clean target
 .PHONY: clean
 clean:
 	rm -rf $(BUILD_DIR)
 	@echo "🧹 Cleaned build files."
 
-# Run (optional target)
+# Run target
 .PHONY: run
 run: all
 	./$(BUILD_DIR)/$(TARGET)
 
-# Unit Tests (optional)
+# Dependency check
+.PHONY: check-deps
+check-deps:
+	@./scripts/check_deps.sh
+
+# Unit test target
 TEST_SRCS := $(wildcard $(TEST_DIR)/*.c)
 TEST_OBJS := $(patsubst $(TEST_DIR)/%.c, $(BUILD_DIR)/%.test.o, $(TEST_SRCS))
 TEST_BIN := $(BUILD_DIR)/run_tests
@@ -55,15 +60,7 @@ test: $(TEST_BIN)
 $(TEST_BIN): $(OBJS) $(TEST_OBJS)
 	@mkdir -p $(@D)
 	$(CC) $(CFLAGS) -o $@ $^
-	@echo "✅ Built tests: $@"
 
 $(BUILD_DIR)/%.test.o: $(TEST_DIR)/%.c
 	@mkdir -p $(@D)
 	$(CC) $(CFLAGS) -c $< -o $@
-
-.PHONY: all check-deps
-
-all: check-deps $(BUILD_DIR)/$(TARGET)
-
-check-deps:
-	@./scripts/check_deps.sh
