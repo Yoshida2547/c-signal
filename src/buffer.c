@@ -2,24 +2,34 @@
 
 // Move to pointer to next position on buffer. 
 // If its on the end of buffer then move to the begin.
-void circular_buffer_pointer_next(uint32_t *pointer, uint32_t size) {
-    if(*pointer - 1 == size) {
+int circular_buffer_pointer_next(uint32_t *pointer, uint32_t size) {
+
+    // Check if input is valid.
+    if(size == 0) return -1;
+    if(*pointer >= size) return -1;
+
+    if(*pointer == size - 1) {
         *pointer = 0;
     } else {
-        *pointer = *pointer - 1;
+        *pointer = *pointer + 1;
     }
-    return;
+    return 0;
 }
 
 // Move to pointer to previos position on buffer. 
 // If its on the begin of buffer then move to end of buffer.
-void circular_buffer_pointer_prev(uint32_t *pointer, uint32_t size) {
+int circular_buffer_pointer_prev(uint32_t *pointer, uint32_t size) {
+
+     // Check if input is valid.
+    if(*pointer >= size) return -1;
+    if(size == 0) return -1;
+
     if(*pointer == 0) {
         *pointer = size - 1;
     } else {
-        *pointer = *pointer + 1;
+        *pointer = *pointer - 1;
     }
-    return;
+    return 0;
 }
 
 // Return the index on circular buffer that correspond to order.

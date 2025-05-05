@@ -1,19 +1,23 @@
 # Project name
-TARGET := my_project
+TARGET := my_app
 
 # Directories
 SRC_DIR := src
-INC_DIRS := include lib/minunit
 BUILD_DIR := build
 TEST_DIR := tests
 
+INC_DIRS := \
+include \
+lib/minunit \
+
+
 # Compiler and flags
 CC := gcc
-CFLAGS := -Wall -Wextra $(foreach dir,$(INC_DIRS),-I$(dir))
+CFLAGS := -Wall -Wextra -std=c11 $(foreach dir,$(INC_DIRS),-I$(dir))
 LDFLAGS := 
 
 # Source and object files
-SRCS := $(wildcard $(SRC_DIR)/*.c)
+SRCS := $(shell find $(SRC_DIR) -name '*.c')
 OBJS := $(patsubst $(SRC_DIR)/%.c, $(BUILD_DIR)/%.o, $(SRCS))
 
 # Default target
@@ -64,3 +68,4 @@ $(TEST_BIN): $(OBJS) $(TEST_OBJS)
 $(BUILD_DIR)/%.test.o: $(TEST_DIR)/%.c
 	@mkdir -p $(@D)
 	$(CC) $(CFLAGS) -c $< -o $@
+
