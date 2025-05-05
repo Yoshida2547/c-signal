@@ -1,5 +1,6 @@
 # Project name
 TARGET := my_app
+TARGET_ENTRY := main
 
 # Directories
 SRC_DIR := src
@@ -69,4 +70,4 @@ test: $(TEST_BINS)
 
 $(BUILD_DIR)/$(TEST_DIR)/%: $(TEST_DIR)/%.c $(OBJS)
 	@mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) -o $@ $< $(OBJS)
+	$(CC) $(CFLAGS) -o $@ $< $(filter-out $(BUILD_DIR)/$(TARGET_ENTRY).o, $(OBJS))

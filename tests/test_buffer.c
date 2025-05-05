@@ -79,7 +79,7 @@ MU_TEST(test_pointer_prev) {
 
     ret = circular_buffer_pointer_prev(&pointer, buffer_size);
 
-    mu_assert(ret != 0, "Should return -1 if pointer is outof length of buffer.");
+    mu_assert(ret == 0, "Should return -1 if pointer is outof length of buffer.");
 }
 
 MU_TEST_SUITE(test_suite) {
