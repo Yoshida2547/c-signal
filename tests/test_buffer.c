@@ -2,6 +2,8 @@
 #include "minunit.h"
 
 #include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 MU_TEST(test_pointer_next) {
     // Test next
