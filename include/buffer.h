@@ -2,11 +2,31 @@
 #define __BUFFER_H__
 
 #include <stdint.h>
+#include <stdlib.h>
 
-int circular_buffer_pointer_next(uint32_t *pointer, uint32_t size);
-int circular_buffer_pointer_prev(uint32_t *pointer, uint32_t size);
+#define FROM_VOID_P(void_ptr, datatype) (datatype *) void_ptr
+#define FROM_VOID(void_ptr, datatype) *(FROM_VOID_P(void_ptr, datatype))
 
-uint32_t circular_buffer_index(uint32_t current, uint32_t buffer_size, uint32_t index);
-void *circular_buffer_get(uint32_t current, uint32_t buffer_size, uint32_t index, void **buffer, __ssize_t size);
+#define TO_VOID_P(data) (void *) &(data)
+
+#define CIRCULAR_PUSH(buffer, value, datatype) FROM_VOID(buffer_circular_push(&(buffer), TO_VOID(value, datatype)), datatype) ? 0
+
+typedef struct {
+
+    uint32_t    buffer_size;
+    size_t      datatype_size;
+
+    void *      buffer_ptr; /*Point to next buffer to write to.*/
+    void **     buffer;
+
+} Buffer;
+
+// Generic function
+Buffer *buffer_init(Buffer *, uint32_t buffer_size, size_t datatype_size);
+
+// Circular buffer function
+void * buffer_circular_push(Buffer *, void *);
+
+
 
 #endif

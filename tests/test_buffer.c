@@ -1,95 +1,26 @@
 #include "buffer.h"
 #include "minunit.h"
 
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
+MU_TEST(test_void_func) {
+    int i = 91;
 
-MU_TEST(test_pointer_next) {
-    // Test next
-    uint32_t ret; // Error handdle
+    int *i_ptr = &i;
+    void *v_ptr = TO_VOID_P(i);
 
-    uint32_t buffer_size = 16;
-    uint32_t pointer = 8;
+    // Check 1: Memory Address must be the same.
+    mu_assert(i_ptr == v_ptr, "Memory Address must be the same.");
 
-    ret = circular_buffer_pointer_next(&pointer, buffer_size);
-
-    mu_assert( pointer == 9, "pointer should moving to next position.");
-
-    // Test end of buffer
-    buffer_size = 16;
-    pointer = 15;
-
-    ret = circular_buffer_pointer_next(&pointer, buffer_size);
-
-    mu_assert( pointer == 0, "pointer should moving to the begin of buffer.");
-
-    // Test invalid input.
-
-    // buffer_size zero
-    buffer_size = 0;
-    pointer = 15;
-
-    ret = circular_buffer_pointer_next(&pointer, buffer_size);
-
-    mu_assert(ret != 0, "Should return -1 if buffer size 0 input is passing.");
-
-    // pointer outof length
-    buffer_size = 16;
-    pointer = 16;
-
-    ret = circular_buffer_pointer_next(&pointer, buffer_size);
-
-    mu_assert(ret != 0, "Should return -1 if pointer is outof length of buffer.");
+    // Check 2: Return value must be the same.
+    int j = FROM_VOID(v_ptr, int);
+    mu_assert(i == j, "Retun value must be the same.");
 }
 
-
-MU_TEST(test_pointer_prev) {
-    // Test next
-    uint32_t ret; // Error handdle
-
-    uint32_t buffer_size = 16;
-    uint32_t pointer = 7;
-
-    ret = circular_buffer_pointer_prev(&pointer, buffer_size);
-
-    mu_assert(pointer == 6, "pointer should moving to previous position.");
-
-    // Test end of buffer
-    buffer_size = 16;
-    pointer = 0;
-
-    ret = circular_buffer_pointer_prev(&pointer, buffer_size);
-
-    mu_assert(pointer == 15, "pointer should moving to the begin of buffer.");
-
-    // Test invalid input.
-
-    // buffer_size zero
-    buffer_size = 0;
-    pointer = 15;
-
-    ret = circular_buffer_pointer_prev(&pointer, buffer_size);
-
-    mu_assert(ret != 0, "Should return -1 if buffer size 0 input is passing.");
-
-    // pointer outof length
-    buffer_size = 14;
-    pointer = 16;
-
-    ret = circular_buffer_pointer_prev(&pointer, buffer_size);
-
-    mu_assert(ret == 0, "Should return -1 if pointer is outof length of buffer.");
-}
-
-MU_TEST_SUITE(test_suite) {
-    MU_RUN_TEST(test_pointer_next);
-    MU_RUN_TEST(test_pointer_prev);
+MU_TEST_SUITE(test_suit) {
+    MU_RUN_TEST(test_void_func);
 }
 
 int main() {
-    MU_RUN_SUITE(test_suite);
+    MU_RUN_SUITE(test_suit);
     MU_REPORT();
     return 0;
 }
-
