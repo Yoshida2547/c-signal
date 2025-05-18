@@ -3,30 +3,50 @@
 
 #include <stdint.h>
 #include <stdlib.h>
-
-#define FROM_VOID_P(void_ptr, datatype) (datatype *) void_ptr
-#define FROM_VOID(void_ptr, datatype) *(FROM_VOID_P(void_ptr, datatype))
-
-#define TO_VOID_P(data) (void *) &(data)
-
-#define CIRCULAR_PUSH(buffer, value, datatype) FROM_VOID(buffer_circular_push(&(buffer), TO_VOID(value, datatype)), datatype) ? 0
+#include <string.h>
 
 typedef struct {
+/*
+    Structure description
+*/
+    size_t buffer_size;
+    size_t data_size;
 
-    uint32_t    buffer_size;
-    size_t      datatype_size;
+/*
+    Structure state
+*/
+    uint32_t head;
+    uint32_t tail;
 
-    void *      buffer_ptr; /*Point to next buffer to write to.*/
-    void **     buffer;
+    void *buffer;
 
-} Buffer;
+} buffer_t;
 
-// Generic function
-Buffer *buffer_init(Buffer *, uint32_t buffer_size, size_t datatype_size);
+/*
+    Initialize the circular buffer. allocate memory for buffer. return 0 if suscess.
+*/
+int buffer_init(buffer_t *buf, size_t buffer_size, size_t data_size);
+void buffer_free(buffer_t *buf);
 
-// Circular buffer function
-void * buffer_circular_push(Buffer *, void *);
+/*
+    Generic Function
+*/
+int buffer_get(buffer_t *buf, void *data, uint32_t index);
+int buffer_set(buffer_t *buf, void *data, uint32_t index);
 
+int buffer_get_byte(buffer_t *buf, uint8_t *data, uint32_t index);
+int buffer_set_byte(buffer_t *buf, uint8_t *data, uint32_t index);
 
+/*
+    UNencapsulate
+*/
+int circular_buf_push(buffer_t *buf, void *data);
+int circular_buf_pop(buffer_t *buf, void *data);
+
+int circular_buf_get_oldest(buffer_t *buf, void *data, uint32_t offset);
+int circular_buf_get_newest(buffer_t *buf, void *data, uint32_t offset);
+
+void circular_buf_next(buffer_t *buf, uint32_t *ptr);
+void circular_buf_prev(buffer_t *buf, uint32_t *ptr);
 
 #endif

@@ -15,7 +15,7 @@ lib/minunit \
 # Compiler and flags
 CC := gcc
 CFLAGS := -Wall -Wextra -std=gnu11 $(foreach dir,$(INC_DIRS),-I$(dir))
-LDFLAGS := 
+LDFLAGS :=  -lm
 
 # Source and object files
 SRCS := $(wildcard $(SRC_DIR)/*.c)
@@ -70,4 +70,4 @@ test: $(TEST_BINS)
 
 $(BUILD_DIR)/$(TEST_DIR)/%: $(TEST_DIR)/%.c $(OBJS)
 	@mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) -o $@ $< $(filter-out $(BUILD_DIR)/$(TARGET_ENTRY).o, $(OBJS))
+	$(CC) $(CFLAGS) -o $@ $< $(filter-out $(BUILD_DIR)/$(TARGET_ENTRY).o, $(OBJS)) -g $(LDFLAGS)
