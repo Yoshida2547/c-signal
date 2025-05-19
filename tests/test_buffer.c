@@ -104,7 +104,7 @@ MU_TEST(test_circular_get_oldest) {
 
     buffer_reset();
 
-    for(uint32_t i = 0; i < 20; i++) {
+    for(uint32_t i = 0; i < 28; i++) {
         float tmp = i;
 
         circular_buf_push(buf, &tmp);
@@ -112,7 +112,7 @@ MU_TEST(test_circular_get_oldest) {
 
     int fail = 0;
 
-    float test[] = {4,5,6,7,8};
+    float test[] = {12,13,14,15,16};
 
     for(int i = 0; i<5; i++) {
         float tmp = 0;

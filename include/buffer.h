@@ -38,7 +38,7 @@ int buffer_get_byte(buffer_t *buf, uint8_t *data, uint32_t index);
 int buffer_set_byte(buffer_t *buf, uint8_t *data, uint32_t index);
 
 /*
-    UNencapsulate
+    Wrapper
 */
 int circular_buf_push(buffer_t *buf, void *data);
 int circular_buf_pop(buffer_t *buf, void *data);
@@ -48,5 +48,9 @@ int circular_buf_get_newest(buffer_t *buf, void *data, uint32_t offset);
 
 void circular_buf_next(buffer_t *buf, uint32_t *ptr);
 void circular_buf_prev(buffer_t *buf, uint32_t *ptr);
+
+/*
+    Helper
+*/
 
 #endif
