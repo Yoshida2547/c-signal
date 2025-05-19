@@ -1,95 +1,202 @@
 #include "buffer.h"
 #include "minunit.h"
 
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include <math.h>
 
-MU_TEST(test_pointer_next) {
-    // Test next
-    uint32_t ret; // Error handdle
+#define BUFFER_SIZE 16
 
-    uint32_t buffer_size = 16;
-    uint32_t pointer = 8;
+buffer_t *buf;
 
-    ret = circular_buffer_pointer_next(&pointer, buffer_size);
+void print_buffer();
+void buffer_reset();
 
-    mu_assert( pointer == 9, "pointer should moving to next position.");
+MU_TEST(test_buffer_init) {
+    int ret = 0;
 
-    // Test end of buffer
-    buffer_size = 16;
-    pointer = 15;
+    ret = buffer_init(buf, BUFFER_SIZE, sizeof(float));
+    mu_assert(!ret, "Fail to initialize buffer.");
 
-    ret = circular_buffer_pointer_next(&pointer, buffer_size);
+    buffer_free(buf);
 
-    mu_assert( pointer == 0, "pointer should moving to the begin of buffer.");
+    ret = buffer_init(NULL, BUFFER_SIZE, sizeof(float));
+    mu_assert(ret,"Fail to handle invalid parameters.");
 
-    // Test invalid input.
+    ret = buffer_init(buf, 0, sizeof(float));
+    mu_assert(ret,"Fail to handle invalid parameters.");
 
-    // buffer_size zero
-    buffer_size = 0;
-    pointer = 15;
+    ret = buffer_init(buf, BUFFER_SIZE, 0);
+    mu_assert(ret,"Fail to handle invalid parameters.");
 
-    ret = circular_buffer_pointer_next(&pointer, buffer_size);
-
-    mu_assert(ret != 0, "Should return -1 if buffer size 0 input is passing.");
-
-    // pointer outof length
-    buffer_size = 16;
-    pointer = 16;
-
-    ret = circular_buffer_pointer_next(&pointer, buffer_size);
-
-    mu_assert(ret != 0, "Should return -1 if pointer is outof length of buffer.");
+    ret = buffer_init(buf, BUFFER_SIZE, sizeof(float));
 }
 
+MU_TEST(test_buffer_set_get) {
+    for(int i = 0; i < 16; i++) {
+        float tmp = sinf(2*M_PI*i/16);
 
-MU_TEST(test_pointer_prev) {
-    // Test next
-    uint32_t ret; // Error handdle
+        buffer_set(buf, &tmp, i);
+    }
 
-    uint32_t buffer_size = 16;
-    uint32_t pointer = 7;
+    int fail = 0;
 
-    ret = circular_buffer_pointer_prev(&pointer, buffer_size);
+    for(int i = 0; i < 16; i++) {
+        float tmp = 0;
+        float test = sinf(2*M_PI*i/16);
 
-    mu_assert(pointer == 6, "pointer should moving to previous position.");
+        buffer_get(buf, &tmp, i);
 
-    // Test end of buffer
-    buffer_size = 16;
-    pointer = 0;
+        if(tmp != test) {
+           fail += 1;
+        }
+    }
 
-    ret = circular_buffer_pointer_prev(&pointer, buffer_size);
-
-    mu_assert(pointer == 15, "pointer should moving to the begin of buffer.");
-
-    // Test invalid input.
-
-    // buffer_size zero
-    buffer_size = 0;
-    pointer = 15;
-
-    ret = circular_buffer_pointer_prev(&pointer, buffer_size);
-
-    mu_assert(ret != 0, "Should return -1 if buffer size 0 input is passing.");
-
-    // pointer outof length
-    buffer_size = 14;
-    pointer = 16;
-
-    ret = circular_buffer_pointer_prev(&pointer, buffer_size);
-
-    mu_assert(ret == 0, "Should return -1 if pointer is outof length of buffer.");
+    mu_assert(fail == 0, "Fail to write to or read from.");
 }
 
-MU_TEST_SUITE(test_suite) {
-    MU_RUN_TEST(test_pointer_next);
-    MU_RUN_TEST(test_pointer_prev);
+MU_TEST(test_buffer_set_get_byte) {
+    for(uint32_t i = 0; i < buf->buffer_size; i++) {
+        uint8_t tmp = i;
+
+        buffer_set_byte(buf, &tmp, i);
+    }
+
+    int fail = 0;
+
+    for(uint32_t i = 0; i < buf->buffer_size; i++) {
+        uint8_t tmp = 0;
+        uint8_t test = i;
+
+        buffer_get_byte(buf, &tmp, i);
+
+        if(tmp != test) {
+            fail += 1;
+        }
+    }
+
+    mu_assert(fail == 0, "Fail to write to or read from.");
+}
+
+MU_TEST(test_circular_push_pop) {
+    buffer_reset();
+
+    for(uint32_t i = 0; i < buf->buffer_size; i++) {
+        float tmp = sinf(2*M_PI*i/15);
+        circular_buf_push(buf, &tmp);
+    }
+
+    int fail = 0;
+
+    for(uint32_t i = 0; i < buf->buffer_size; i++) {
+        float tmp = 0;
+        float test = sinf(2*M_PI*i/15);
+
+        circular_buf_pop(buf, &tmp);
+        
+        if(tmp != test) {
+            fail += 1;
+        }
+    }
+
+    mu_assert(fail == 0, "Fail to write to or read from.");
+}
+
+MU_TEST(test_circular_get_oldest) {
+
+    buffer_reset();
+
+    for(uint32_t i = 0; i < 28; i++) {
+        float tmp = i;
+
+        circular_buf_push(buf, &tmp);
+    }
+
+    int fail = 0;
+
+    float test[] = {12,13,14,15,16};
+
+    for(int i = 0; i<5; i++) {
+        float tmp = 0;
+
+        circular_buf_get_oldest(buf, &tmp, i);
+
+        if(test[i] != tmp) {
+            fail += 1;
+        }
+    }
+
+    mu_assert(fail == 0, "Fail to write to or read from.");
+}
+
+MU_TEST(test_circular_get_newest) {
+    buffer_reset();
+
+    for(uint32_t i = 0; i < 20; i++) {
+        float tmp = i;
+
+        circular_buf_push(buf, &tmp);
+    }
+
+    int fail = 0;
+
+    float test[] = {19,18,17,16,15};
+
+    for(int i = 0; i<5; i++) {
+        float tmp = 0;
+
+        circular_buf_get_newest(buf, &tmp, i);
+
+        if(test[i] != tmp) {
+            fail += 1;
+        }
+    }
+
+    mu_assert(fail == 0, "Fail to write to or read from.");
+}
+
+MU_TEST_SUITE(test_suit) {
+    MU_RUN_TEST(test_buffer_init);
+    MU_RUN_TEST(test_buffer_set_get);
+    MU_RUN_TEST(test_buffer_set_get_byte);
+    MU_RUN_TEST(test_circular_push_pop);
+
+    MU_RUN_TEST(test_circular_get_oldest);
+    MU_RUN_TEST(test_circular_get_newest);
+}
+
+void print_buffer() {
+    printf("==================\r\n");
+    for(uint32_t i = 0; i < 16; i++) {
+        float tmp = 0;
+
+        buffer_get(buf, &tmp, i);
+
+        if(i == buf->head) {
+            printf("H>%8.2f", tmp);
+        } else {
+            printf("%10.2f", tmp); 
+        }
+
+        if(i == buf->tail) {
+            printf("    <T\r\n");
+        } else {
+            printf("\r\n");
+        }
+    }
+    printf("==================\r\n");
+}
+
+void buffer_reset() {
+    buffer_free(buf);
+
+    buf =  (buffer_t *) malloc(sizeof(buffer_t));
+    buffer_init(buf, BUFFER_SIZE, sizeof(float));
 }
 
 int main() {
-    MU_RUN_SUITE(test_suite);
+    buf =  (buffer_t *) malloc(sizeof(buffer_t));
+
+    MU_RUN_SUITE(test_suit);
     MU_REPORT();
+
     return 0;
 }
-
