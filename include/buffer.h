@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define BUFFER_MODE 3
+#define BUFFER_MODE 0
 
 /*
     MODE:

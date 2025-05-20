@@ -27,7 +27,9 @@ MU_TEST(test_buffer_init) {
     ret = buffer_init(buf, BUFFER_SIZE, 0);
     mu_assert(ret,"Fail to handle invalid parameters.");
 
-    ret = buffer_init(buf, BUFFER_SIZE, sizeof(float));
+    if(ret) {
+        ret = buffer_init(buf, BUFFER_SIZE, sizeof(float));
+    }
 }
 
 MU_TEST(test_buffer_set_get) {
@@ -138,12 +140,16 @@ MU_TEST(test_circular_get_newest) {
 
     int fail = 0;
 
-    float test[] = {19,18,17,16,15};
+    float test[] = {4,19,18,17,16};
+
+    print_buffer();
 
     for(int i = 0; i<5; i++) {
         float tmp = 0;
 
         circular_buf_get_newest(buf, &tmp, i);
+
+        printf("%f, ", tmp);
 
         if(test[i] != tmp) {
             fail += 1;

@@ -170,7 +170,9 @@ int circular_buf_get_newest(buffer_t *buf, BUFFER_DATATYPE *data, uint32_t offse
     if(data == NULL)                return -1; 
     if(offset > buf->buffer_size - 1) return -1; 
 
-    uint32_t index = buf->buffer_size - (offset - buf->head)%buf->buffer_size;
+    uint32_t index = buf->buffer_size - (offset - buf->head - 1)%buf->buffer_size - 1;
+
+    printf("index: %d \r\n", index);
 
     buffer_get(buf, data, index);
 
