@@ -82,10 +82,12 @@ typedef struct {
 #ifdef __BUFFER_GENERIC__
 
 int buffer_init(buffer_t *buf, size_t buffer_size, size_t data_size);
+int buffer_new(buffer_t *buf, size_t buffer_size, size_t data_size);
 
 #else
 
 int buffer_init(buffer_t *buf, size_t buffer_size);
+int buffer_new(buffer_t *buf, size_t buffer_size);
 
 #endif
 

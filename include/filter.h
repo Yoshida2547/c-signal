@@ -1,7 +1,23 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#include "buffer.h"
+
 #ifndef __FILTER_H__
 #define __FILTER_H__
 
-#include "buffer.h"
+#define FILTER_THROWN_ERROR 0
+
+#if FILTER_THROWN_ERROR == 1
+#define FILTER_ERROR(msg, ...)  fprintf(stderr, msg, ##__VA_ARGS__)
+
+#else
+#define FILTER_ERROR(msg, ...)
+
+#endif
+
+#define FREE_BUF_INPUT  1 << 0
+#define FREE_BUF_OUTPUT 1 << 0
 
 #ifndef __BUFFER_GENERIC__
 
@@ -13,8 +29,8 @@ typedef struct {
     BUFFER_DATATYPE *coefficient;
 } filter_fir_t;
 
-int filter_fir_init(filter_fir_t *fil, uint32_t order);
-int filter_fir_free(filter_fir_t *fil);
+int filter_fir_init(filter_fir_t *fil, buffer_t *input_buffer, buffer_t *output_buffer, uint32_t order);
+int filter_fir_free(filter_fir_t *fil, char OPTIONS);
 
 int filter_fir_get_coeficient(filter_fir_t *fil, BUFFER_DATATYPE *cof);
 int filter_fir_set_coeficient(filter_fir_t *fil, BUFFER_DATATYPE *cof);

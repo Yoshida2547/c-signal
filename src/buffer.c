@@ -61,6 +61,37 @@ int buffer_init(buffer_t *buf, size_t buffer_size)
     return 0;
 }
 
+#ifdef __BUFFER_GENERIC__
+
+int buffer_new(buffer_t *buf, size_t buffer_size, size_t data_size)
+
+#else
+
+int buffer_new(buffer_t *buf, size_t buffer_size)
+
+#endif
+
+{
+    buf = (buffer_t *) malloc(sizeof(buffer_t));
+
+    if(buf == NULL) {
+        BUFFER_ERROR("ERROR: Fail to allocate memory for Buffer struct.");
+        return -1;
+    }
+
+    int ret = 0;
+
+#ifdef __BUFFER_GENERIC__
+    ret = buffer_init(buf, buffer_size, data_size);
+#else
+    ret = buffer_init(buf, buffer_size);
+#endif
+
+    return ret;
+}
+
+
+
 void buffer_free(buffer_t *buf) {
     free(buf->buffer);
     free(buf);
