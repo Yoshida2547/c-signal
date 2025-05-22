@@ -9,6 +9,8 @@
 
 #define BUFFER_THROWN_ERROR 0
 
+#define BUFFER_FROCE_POWER_OF_2 1
+
 #if BUFFER_THROWN_ERROR  == 1
 #define BUFFER_ERROR(msg, ...)  fprintf(stderr, msg, ##__VA_ARGS__)
 

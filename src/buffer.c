@@ -19,6 +19,18 @@ int buffer_init(buffer_t *buf, size_t buffer_size)
         return -1;
     }
 
+#if BUFFER_FROCE_POWER_OF_2 == 1
+    if((buffer_size & (buffer_size - 1)) != 0) {
+        BUFFER_ERROR("ERROR: Buffer size must be a power of 2. \r\n");
+        return -1;
+    }
+#endif
+
+    if(buffer_size == 0) {
+        BUFFER_ERROR("ERROR: ZERO Buffer size was given. \r\n");
+        return -1;
+    }
+
 #ifdef __BUFFER_GENERIC__
     if(data_size == 0) {
         BUFFER_ERROR(stderr, "ERROR: ZERO Buffer datasize size was given. \r\n");
@@ -179,7 +191,7 @@ int circular_buf_get_newest(buffer_t *buf, BUFFER_DATATYPE *data, uint32_t offse
     if(data == NULL)                return -1; 
     if(offset > buf->buffer_size - 1) return -1; 
 
-    uint32_t index = buf->buffer_size - (offset - buf->head - 1)%buf->buffer_size - 1;
+    uint32_t index = (buf->head - offset + buf->buffer_size) % buf->buffer_size;
 
     buffer_get(buf, data, index);
 
