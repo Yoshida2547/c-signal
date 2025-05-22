@@ -10,12 +10,20 @@ int buffer_init(buffer_t *buf, size_t buffer_size)
 
 #endif
 {
-
-    if(buf == NULL) return -1;
-    if(buffer_size == 0) return -1;
+    if(buf == NULL) {
+        BUFFER_ERROR("ERROR: NULL pointer was given. \r\n");
+        return -1;
+    }
+    if(buffer_size == 0) {
+        BUFFER_ERROR("ERROR: ZERO Buffer size was given. \r\n");
+        return -1;
+    }
 
 #ifdef __BUFFER_GENERIC__
-    if(data_size == 0) return -1;
+    if(data_size == 0) {
+        BUFFER_ERROR(stderr, "ERROR: ZERO Buffer datasize size was given. \r\n");
+        return -1;
+    }
 #endif
 
     buf->buffer_size = buffer_size;
@@ -31,6 +39,7 @@ int buffer_init(buffer_t *buf, size_t buffer_size)
     buf->buffer = (BUFFER_DATATYPE *) malloc(total_size);
 
     if(buf->buffer == NULL) {
+        BUFFER_ERROR("ERROR: Fail to allocate memory for buffer. \r\n");
         return -1;
     }
 
@@ -171,8 +180,6 @@ int circular_buf_get_newest(buffer_t *buf, BUFFER_DATATYPE *data, uint32_t offse
     if(offset > buf->buffer_size - 1) return -1; 
 
     uint32_t index = buf->buffer_size - (offset - buf->head - 1)%buf->buffer_size - 1;
-
-    printf("index: %d \r\n", index);
 
     buffer_get(buf, data, index);
 

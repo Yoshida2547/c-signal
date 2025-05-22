@@ -5,7 +5,19 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define BUFFER_MODE 0
+#include <stdio.h>
+
+#define BUFFER_THROWN_ERROR 0
+
+#if BUFFER_THROWN_ERROR  == 1
+#define BUFFER_ERROR(msg, ...)  fprintf(stderr, msg, ##__VA_ARGS__)
+
+#else
+#define BUFFER_ERROR(msg, ...)
+
+#endif
+
+#define BUFFER_MODE 3
 
 /*
     MODE:
