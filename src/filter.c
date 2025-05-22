@@ -85,9 +85,9 @@ int filter_fir_update(filter_fir_t *fil) {
 
     BUFFER_DATATYPE result = 0;
 
-    for(int i = 0; i < fil->order; i++) {
+    for(uint32_t i = 0; i < fil->order; i++) {
         BUFFER_DATATYPE tmp = 0;
-        circular_buf_get_newest(fil->input_buffer, &tmp, i);
+        circular_buf_get_newest(fil->input_buffer, &tmp, i + 1);
 
         result += fil->coefficient[i]*tmp;
     }

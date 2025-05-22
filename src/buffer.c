@@ -207,9 +207,19 @@ void circular_buf_prev(buffer_t *buf, uint32_t *ptr) {
     return;
 }
  
-int circular_buf_get_oldest(buffer_t *buf, BUFFER_DATATYPE *data, uint32_t offset) {
+int circular_buf_get_oldest(buffer_t *buf, BUFFER_DATATYPE *data, int offset) {
     if(data == NULL)                return -1; 
-    if(offset > buf->buffer_size - 1) return -1; 
+    if(offset > (int) buf->buffer_size - 1) return -1; 
+
+    if(offset == 0) {
+        buffer_get(buf, data, buf->head);
+    }
+
+    if(offset < 0) {
+        circular_buf_get_newest(buf, data, -offset);
+
+        return 0;
+    }
 
     uint32_t index = (buf->head + offset)%buf->buffer_size;
 
@@ -218,9 +228,19 @@ int circular_buf_get_oldest(buffer_t *buf, BUFFER_DATATYPE *data, uint32_t offse
     return 0;
 }
 
-int circular_buf_get_newest(buffer_t *buf, BUFFER_DATATYPE *data, uint32_t offset) {
+int circular_buf_get_newest(buffer_t *buf, BUFFER_DATATYPE *data, int offset) {
     if(data == NULL)                return -1; 
-    if(offset > buf->buffer_size - 1) return -1; 
+    if(offset > (int) buf->buffer_size - 1) return -1; 
+
+    if(offset == 0) {
+        buffer_get(buf, data, buf->head);
+    }
+
+    if(offset < 0) {
+        circular_buf_get_oldest(buf, data, -offset);
+
+        return 0;
+    }
 
     uint32_t index = (buf->head - offset + buf->buffer_size) % buf->buffer_size;
 

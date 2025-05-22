@@ -108,8 +108,8 @@ int buffer_set_byte(buffer_t *buf, uint8_t *data, uint32_t index);
 int circular_buf_push(buffer_t *buf, BUFFER_DATATYPE *data);
 int circular_buf_pop(buffer_t *buf, BUFFER_DATATYPE *data);
 
-int circular_buf_get_oldest(buffer_t *buf,  BUFFER_DATATYPE *data, uint32_t offset);
-int circular_buf_get_newest(buffer_t *buf, BUFFER_DATATYPE *data, uint32_t offset);
+int circular_buf_get_oldest(buffer_t *buf,  BUFFER_DATATYPE *data, int offset);
+int circular_buf_get_newest(buffer_t *buf, BUFFER_DATATYPE *data, int offset);
 
 void circular_buf_next(buffer_t *buf, uint32_t *ptr);
 void circular_buf_prev(buffer_t *buf, uint32_t *ptr);
